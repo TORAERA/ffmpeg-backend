@@ -1,1 +1,17 @@
-echo node_modules > .gitignore
+# Node.js関連のフォルダやファイルを無視
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+package-lock.json
+
+# 環境変数ファイルを無視（必要に応じて）
+.env
+
+# IDEやエディタの設定ファイルを無視
+.vscode/
+.idea/
+.DS_Store
+
+# OS固有のファイル
+Thumbs.db
