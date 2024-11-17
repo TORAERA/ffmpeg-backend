@@ -67,7 +67,8 @@ async function saveFrames(frames, videoId) {
 // 動画を生成する関数
 function generateVideo(framePaths, frameRate, outputPath) {
     return new Promise((resolve, reject) => {
-        const inputPattern = path.join(framesDir, framePaths[0].replace(/_\d+\.png$/, '_%03d.png'));
+        // 修正: パスの組み立てを修正
+        const inputPattern = path.join(framesDir, path.basename(framePaths[0]).replace(/_\d+\.png$/, '_%03d.png'));
         const args = ['-r', frameRate, '-i', inputPattern, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', outputPath];
 
         execFile(ffmpeg, args, (error) => {
