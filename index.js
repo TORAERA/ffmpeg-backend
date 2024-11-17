@@ -23,7 +23,7 @@ app.use(cors({
     allowedHeaders: 'Content-Type'
 }));
 
-app.use(bodyParser.json({ limit: '50mb' })); // リクエストサイズの制限を緩和
+app.use(bodyParser.json({ limit: '100mb' })); // リクエストサイズの制限を緩和
 
 app.post('/render', async (req, res) => {
     const { frames, frameRate } = req.body;
