@@ -8,7 +8,7 @@ const { v4: uuidv4 } = require('uuid');
 const cors = require('cors'); // CORSミドルウェアを読み込み
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000; // Render環境ではPORTが設定される
 
 const framesDir = path.join(__dirname, 'frames');
 const outputDir = path.join(__dirname, 'output');
