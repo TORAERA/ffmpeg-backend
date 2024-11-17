@@ -23,7 +23,7 @@ app.use(cors({
     allowedHeaders: 'Content-Type'
 }));
 
-app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.json({ limit: '50mb' })); // リクエストサイズの制限を緩和
 
 app.post('/render', async (req, res) => {
     const { frames, frameRate } = req.body;
@@ -37,8 +37,7 @@ app.post('/render', async (req, res) => {
 
         res.json({ videoUrl: `${process.env.BASE_URL || 'http://localhost:' + PORT}/output/${videoId}.mp4` });
 
-        setTimeout(() => cleanup(videoId), 60000); // 60秒後に削除
-
+        setTimeout(() => cleanup(videoId), 60000); // 60秒後に出力ファイルとフレームを削除
     } catch (error) {
         console.error('Error during rendering:', error);
         res.status(500).send('Error occurred during video rendering.');
@@ -51,6 +50,7 @@ app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
 
+// フレームを保存する関数
 async function saveFrames(frames, videoId) {
     const framePaths = [];
     for (let i = 0; i < frames.length; i++) {
@@ -62,6 +62,7 @@ async function saveFrames(frames, videoId) {
     return framePaths;
 }
 
+// 動画を生成する関数
 function generateVideo(framePaths, frameRate, outputPath) {
     return new Promise((resolve, reject) => {
         const inputPattern = path.join(framesDir, framePaths[0].replace(/_\d+\.png$/, '_%03d.png'));
@@ -74,6 +75,7 @@ function generateVideo(framePaths, frameRate, outputPath) {
     });
 }
 
+// 不要なファイルを削除する関数
 async function cleanup(videoId) {
     const frameFiles = fs.readdirSync(framesDir).filter(file => file.startsWith(videoId));
     frameFiles.forEach(file => fs.unlinkSync(path.join(framesDir, file)));
