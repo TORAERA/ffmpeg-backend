@@ -23,7 +23,9 @@ app.use(cors({
     allowedHeaders: 'Content-Type'
 }));
 
-app.use(bodyParser.json({ limit: '100mb' })); // リクエストサイズの制限を緩和
+// body-parserのサイズ制限を200MBに設定
+app.use(bodyParser.json({ limit: '200mb' }));
+app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
 
 app.post('/render', (req, res) => {
     const { frames, frameRate } = req.body;
@@ -49,12 +51,6 @@ async function processVideo(frames, frameRate, videoId) {
     await generateVideo(framePaths, frameRate, outputPath);
     setTimeout(() => cleanup(videoId), 60000); // 60秒後に出力ファイルとフレームを削除
 }
-
-app.use('/output', express.static(outputDir));
-
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
 
 // フレームを保存する関数
 async function saveFrames(frames, videoId) {
@@ -89,3 +85,9 @@ async function cleanup(videoId) {
     const outputFile = path.join(outputDir, `${videoId}.mp4`);
     if (fs.existsSync(outputFile)) fs.unlinkSync(outputFile);
 }
+
+app.use('/output', express.static(outputDir));
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
