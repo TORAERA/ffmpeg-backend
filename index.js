@@ -25,24 +25,30 @@ app.use(cors({
 
 app.use(bodyParser.json({ limit: '100mb' })); // リクエストサイズの制限を緩和
 
-app.post('/render', async (req, res) => {
+app.post('/render', (req, res) => {
     const { frames, frameRate } = req.body;
+    const videoId = uuidv4();
 
-    try {
-        const videoId = uuidv4();
-        const framePaths = await saveFrames(frames, videoId);
+    // 非同期的に動画生成を開始
+    processVideo(frames, frameRate, videoId)
+        .then(() => {
+            console.log(`Video ${videoId} processing completed`);
+        })
+        .catch(err => {
+            console.error(`Error processing video ${videoId}:`, err);
+        });
 
-        const outputPath = path.join(outputDir, `${videoId}.mp4`);
-        await generateVideo(framePaths, frameRate, outputPath);
-
-        res.json({ videoUrl: `${process.env.BASE_URL || 'http://localhost:' + PORT}/output/${videoId}.mp4` });
-
-        setTimeout(() => cleanup(videoId), 60000); // 60秒後に出力ファイルとフレームを削除
-    } catch (error) {
-        console.error('Error during rendering:', error);
-        res.status(500).send('Error occurred during video rendering.');
-    }
+    // クライアントにはすぐにレスポンスを返す
+    res.json({ message: 'Video processing started', videoId });
 });
+
+// 非同期処理をバックエンドで行う関数
+async function processVideo(frames, frameRate, videoId) {
+    const framePaths = await saveFrames(frames, videoId);
+    const outputPath = path.join(outputDir, `${videoId}.mp4`);
+    await generateVideo(framePaths, frameRate, outputPath);
+    setTimeout(() => cleanup(videoId), 60000); // 60秒後に出力ファイルとフレームを削除
+}
 
 app.use('/output', express.static(outputDir));
 
