@@ -5,6 +5,7 @@ const ffmpeg = require('ffmpeg-static');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+const cors = require('cors'); // CORSミドルウェアを読み込み
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,6 +15,13 @@ const outputDir = path.join(__dirname, 'output');
 
 if (!fs.existsSync(framesDir)) fs.mkdirSync(framesDir);
 if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
+
+// CORSミドルウェアを適用
+app.use(cors({
+    origin: 'https://mojiil.com', // 必要なオリジンを指定
+    methods: 'GET,POST,OPTIONS',
+    allowedHeaders: 'Content-Type'
+}));
 
 app.use(bodyParser.json({ limit: '50mb' }));
 
