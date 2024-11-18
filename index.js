@@ -67,12 +67,24 @@ async function saveFrames(frames, videoId) {
 // 動画を生成する関数
 function generateVideo(framePaths, frameRate, outputPath) {
     return new Promise((resolve, reject) => {
-        // 修正: パスの組み立てを修正
         const inputPattern = path.join(framesDir, path.basename(framePaths[0]).replace(/_\d+\.png$/, '_%03d.png'));
-        const args = ['-r', frameRate, '-i', inputPattern, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', outputPath];
+        
+        // フレームレートを半分に、解像度を半分に設定
+        const args = [
+            '-r', frameRate / 2, // フレームレートを半分に
+            '-i', inputPattern, 
+            '-vf', 'scale=iw/2:ih/2', // 解像度を半分に
+            '-c:v', 'libx264',
+            '-pix_fmt', 'yuv420p',
+            '-y', 
+            outputPath
+        ];
 
         execFile(ffmpeg, args, (error) => {
-            if (error) return reject(error);
+            if (error) {
+                console.error('FFmpeg error:', error.message);
+                return reject(error);
+            }
             resolve(outputPath);
         });
     });
