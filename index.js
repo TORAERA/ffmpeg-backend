@@ -74,11 +74,14 @@ function generateVideo(framePaths, frameRate, outputPath) {
         
         // 解像度とフレームレートを元に戻す
         const args = [
-            '-r', frameRate,        // 元のフレームレートを使用
+            '-r', frameRate,                     // オリジナルのフレームレート
             '-i', inputPattern,
+            '-vf', 'scale=iw*0.75:ih*0.75',      // 動的に解像度を75%に縮小
             '-c:v', 'libx264',
             '-pix_fmt', 'yuv420p',
-            '-y', 
+            '-crf', '23',                        // クオリティを調整してビットレートを最適化
+            '-preset', 'faster',                 // エンコード速度を速くする
+            '-y',
             outputPath
         ];
 
