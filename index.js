@@ -52,33 +52,33 @@ async function processVideo(frames, frameRate, videoId) {
     const framePaths = await saveFrames(frames, videoId);
     const outputPath = path.join(outputDir, `${videoId}.mp4`);
     await generateVideo(framePaths, frameRate, outputPath);
+    // setTimeout(() => cleanup(videoId), 60000); // 60秒後に出力ファイルとフレームを削除
 }
 
-// フレームを保存する関数 (WebP対応)
+// フレームを保存する関数
 async function saveFrames(frames, videoId) {
     const framePaths = [];
     for (let i = 0; i < frames.length; i++) {
-        const framePath = path.join(framesDir, `${videoId}_frame_${String(i).padStart(3, '0')}.webp`);
-        const base64Data = frames[i].replace(/^data:image\/webp;base64,/, ''); // WebPヘッダーを削除
+        const framePath = path.join(framesDir, `${videoId}_frame_${String(i).padStart(3, '0')}.png`);
+        const base64Data = frames[i].replace(/^data:image\/png;base64,/, '');
         await fs.promises.writeFile(framePath, base64Data, 'base64');
         framePaths.push(framePath);
     }
     return framePaths;
 }
 
-// 動画を生成する関数 (WebP入力対応)
+// 動画を生成する関数
 function generateVideo(framePaths, frameRate, outputPath) {
     return new Promise((resolve, reject) => {
-        const inputPattern = path.join(framesDir, path.basename(framePaths[0]).replace(/_\d+\.webp$/, '_%03d.webp'));
-
+        const inputPattern = path.join(framesDir, path.basename(framePaths[0]).replace(/_\d+\.png$/, '_%03d.png'));
+        
+        // 解像度とフレームレートを元に戻す
         const args = [
-            '-r', frameRate,                        // フレームレート
-            '-i', inputPattern,                     // 入力ファイルパターン
-            '-c:v', 'libx264',                      // 出力形式
-            '-pix_fmt', 'yuv420p',                  // ピクセルフォーマット
-            '-crf', '23',                           // クオリティ調整
-            '-preset', 'faster',                    // エンコード速度
-            '-y',                                   // 上書き許可
+            '-r', frameRate,        // 元のフレームレートを使用
+            '-i', inputPattern,
+            '-c:v', 'libx264',
+            '-pix_fmt', 'yuv420p',
+            '-y', 
             outputPath
         ];
 
