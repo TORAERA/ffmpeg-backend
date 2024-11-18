@@ -52,30 +52,27 @@ async function processVideo(frames, frameRate, videoId) {
     const framePaths = await saveFrames(frames, videoId);
     const outputPath = path.join(outputDir, `${videoId}.mp4`);
     await generateVideo(framePaths, frameRate, outputPath);
-    // setTimeout(() => cleanup(videoId), 60000); // 60秒後に出力ファイルとフレームを削除
 }
 
-// フレームを保存する関数
+// フレームを保存する関数 (WebP対応)
 async function saveFrames(frames, videoId) {
     const framePaths = [];
     for (let i = 0; i < frames.length; i++) {
-        const framePath = path.join(framesDir, `${videoId}_frame_${String(i).padStart(3, '0')}.jpeg`); // 拡張子をjpegに変更
-        const base64Data = frames[i].replace(/^data:image\/jpeg;base64,/, ''); // PNGからJPEGのヘッダーに変更
+        const framePath = path.join(framesDir, `${videoId}_frame_${String(i).padStart(3, '0')}.webp`);
+        const base64Data = frames[i].replace(/^data:image\/webp;base64,/, ''); // WebPヘッダーを削除
         await fs.promises.writeFile(framePath, base64Data, 'base64');
         framePaths.push(framePath);
     }
     return framePaths;
 }
 
-// 動画を生成する関数
+// 動画を生成する関数 (WebP入力対応)
 function generateVideo(framePaths, frameRate, outputPath) {
     return new Promise((resolve, reject) => {
-        const inputPattern = path.join(framesDir, path.basename(framePaths[0]).replace(/_\d+\.jpeg$/, '_%03d.jpeg'));
+        const inputPattern = path.join(framesDir, path.basename(framePaths[0]).replace(/_\d+\.webp$/, '_%03d.webp'));
 
         const args = [
             '-r', frameRate,                        // フレームレート
-            '-analyzeduration', '5000000',          // 入力の解析時間を延長
-            '-probesize', '5000000',                // プローブサイズを増やす
             '-i', inputPattern,                     // 入力ファイルパターン
             '-c:v', 'libx264',                      // 出力形式
             '-pix_fmt', 'yuv420p',                  // ピクセルフォーマット
