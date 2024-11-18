@@ -70,17 +70,18 @@ async function saveFrames(frames, videoId) {
 // 動画を生成する関数
 function generateVideo(framePaths, frameRate, outputPath) {
     return new Promise((resolve, reject) => {
-        const inputPattern = path.join(framesDir, path.basename(framePaths[0]).replace(/_\d+\.png$/, '_%03d.png'));
-        
-        // 解像度とフレームレートを元に戻す
+        const inputPattern = path.join(framesDir, path.basename(framePaths[0]).replace(/_\d+\.jpeg$/, '_%03d.jpeg'));
+
         const args = [
-            '-r', frameRate,                     // オリジナルのフレームレート
-            '-i', inputPattern,
-            '-c:v', 'libx264',
-            '-pix_fmt', 'yuv420p',
-            '-crf', '23',                        // クオリティを調整してビットレートを最適化
-            '-preset', 'faster',                 // エンコード速度を速くする
-            '-y',
+            '-r', frameRate,                        // フレームレート
+            '-analyzeduration', '5000000',          // 入力の解析時間を延長
+            '-probesize', '5000000',                // プローブサイズを増やす
+            '-i', inputPattern,                     // 入力ファイルパターン
+            '-c:v', 'libx264',                      // 出力形式
+            '-pix_fmt', 'yuv420p',                  // ピクセルフォーマット
+            '-crf', '23',                           // クオリティ調整
+            '-preset', 'faster',                    // エンコード速度
+            '-y',                                   // 上書き許可
             outputPath
         ];
 
