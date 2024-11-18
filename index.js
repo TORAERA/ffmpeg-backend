@@ -49,7 +49,7 @@ async function processVideo(frames, frameRate, videoId) {
     const framePaths = await saveFrames(frames, videoId);
     const outputPath = path.join(outputDir, `${videoId}.mp4`);
     await generateVideo(framePaths, frameRate, outputPath);
-    setTimeout(() => cleanup(videoId), 60000); // 60秒後に出力ファイルとフレームを削除
+    // setTimeout(() => cleanup(videoId), 60000); // 60秒後に出力ファイルとフレームを削除
 }
 
 // フレームを保存する関数
