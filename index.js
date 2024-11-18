@@ -59,8 +59,8 @@ async function processVideo(frames, frameRate, videoId) {
 async function saveFrames(frames, videoId) {
     const framePaths = [];
     for (let i = 0; i < frames.length; i++) {
-        const framePath = path.join(framesDir, `${videoId}_frame_${String(i).padStart(3, '0')}.png`);
-        const base64Data = frames[i].replace(/^data:image\/png;base64,/, '');
+        const framePath = path.join(framesDir, `${videoId}_frame_${String(i).padStart(3, '0')}.jpeg`); // 拡張子をjpegに変更
+        const base64Data = frames[i].replace(/^data:image\/jpeg;base64,/, ''); // PNGからJPEGのヘッダーに変更
         await fs.promises.writeFile(framePath, base64Data, 'base64');
         framePaths.push(framePath);
     }
