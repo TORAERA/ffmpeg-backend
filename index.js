@@ -99,7 +99,18 @@ async function cleanup(videoId) {
     if (fs.existsSync(outputFile)) fs.unlinkSync(outputFile);
 }
 
+// 静的ホスティング
 app.use('/output', express.static(outputDir));
+
+// デバッグ用エンドポイント
+app.get('/check-output', (req, res) => {
+    fs.readdir(outputDir, (err, files) => {
+        if (err) {
+            return res.status(500).send('Error reading output directory');
+        }
+        res.json({ files });
+    });
+});
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
