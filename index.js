@@ -72,11 +72,10 @@ function generateVideo(framePaths, frameRate, outputPath) {
     return new Promise((resolve, reject) => {
         const inputPattern = path.join(framesDir, path.basename(framePaths[0]).replace(/_\d+\.png$/, '_%03d.png'));
         
-        // フレームレートを半分に、解像度を半分に設定
+        // 解像度とフレームレートを元に戻す
         const args = [
-            '-r', frameRate / 2, // フレームレートを半分に
-            '-i', inputPattern, 
-            '-vf', 'scale=iw/2:ih/2', // 解像度を半分に
+            '-r', frameRate,        // 元のフレームレートを使用
+            '-i', inputPattern,
             '-c:v', 'libx264',
             '-pix_fmt', 'yuv420p',
             '-y', 
