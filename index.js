@@ -76,7 +76,6 @@ function generateVideo(framePaths, frameRate, outputPath) {
         const args = [
             '-r', frameRate,                     // オリジナルのフレームレート
             '-i', inputPattern,
-            '-vf', 'scale=iw*0.75:ih*0.75',      // 動的に解像度を75%に縮小
             '-c:v', 'libx264',
             '-pix_fmt', 'yuv420p',
             '-crf', '23',                        // クオリティを調整してビットレートを最適化
