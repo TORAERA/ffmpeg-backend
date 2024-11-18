@@ -27,21 +27,24 @@ app.use(cors({
 app.use(bodyParser.json({ limit: '200mb' }));
 app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
 
-app.post('/render', (req, res) => {
+app.post('/render', async (req, res) => {
     const { frames, frameRate } = req.body;
     const videoId = uuidv4();
 
-    // 非同期的に動画生成を開始
-    processVideo(frames, frameRate, videoId)
-        .then(() => {
-            console.log(`Video ${videoId} processing completed`);
-        })
-        .catch(err => {
-            console.error(`Error processing video ${videoId}:`, err);
-        });
+    try {
+        // 動画生成プロセスを非同期で実行
+        await processVideo(frames, frameRate, videoId);
+        console.log(`Video ${videoId} processing completed`);
 
-    // クライアントにはすぐにレスポンスを返す
-    res.json({ message: 'Video processing started', videoId });
+        // 動画生成完了後にフルURLをレスポンスとして返す
+        res.json({
+            message: 'Video processing completed',
+            videoUrl: `https://${req.headers.host}/output/${videoId}.mp4` // フルURLを構築
+        });
+    } catch (err) {
+        console.error(`Error processing video ${videoId}:`, err);
+        res.status(500).json({ error: 'Video processing failed' });
+    }
 });
 
 // 非同期処理をバックエンドで行う関数
